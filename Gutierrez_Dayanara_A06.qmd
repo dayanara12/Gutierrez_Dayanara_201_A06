@@ -102,6 +102,12 @@ Extract the value `8162` (LeBron James points) in 2 different ways:
 - using names
 
 ```{r}
+# using indexing 
+player_info$LJ$points
+
+
+# using names
+player_info [["LJ"]]$points
 
 ```
 
@@ -113,6 +119,14 @@ Add a new named element to the end of each player's list called `height`. The he
 Print the `player_info` list to prove you were successful.
 
 ```{r}
+
+player_heights <- c (MJ = 78, LJ = 81, KB = 78, KA = 86, SO = 85)
+
+for (player in names (player_info)) {
+  player_info [[player]]$height <- player_heights [player]
+}
+
+print (player_info)
 
 ```
 
@@ -133,6 +147,14 @@ Note: this must still run correctly even if the values were to change or if anot
 
 ```{r}
 
+points_per_game_list <- list ()
+
+for (player in names (player_info)) {
+  points_per_game <- player_info [[player]]$points / player_info [[player]]$games_played
+  points_per_game_list [[substr (player, 1, 2)]] <- points_per_game
+}
+
+print (points_per_game_list)
 ```
 
 
@@ -143,6 +165,10 @@ Use the list created in Part c and an appropriate apply function to round each v
 Store the output as a vector and print the results.
 
 ```{r}
+
+rounded_points <- sapply (points_per_game_list, function (x) round (x, 2))
+
+print (rounded_points)
 
 ```
 
@@ -164,6 +190,22 @@ ie: 91 rounds to 90; 173 rounds to 200; 1450 rounds to 1000
 Hint: use `MARGIN = 1:2` to apply the function to each value instead of only a row/col.
 
 ```{r}
+
+my_round <- function (x) {
+  ifelse (nchar (x) == 2, round (x, -1),
+          ifelse (nchar (x) == 3, round (x, -2),
+                  ifelse (nchar (x) == 4, round (x, -3), x)))
+}
+
+rounded_matrix <- apply (mat_rand, MARGIN = c(1, 2), FUN = my_round)
+
+
+rounded_matrix
+
+
+
+
+
 
 ```
 
@@ -189,6 +231,14 @@ Calculate the average temperature for each month across the whole data frame (us
 
 ```{r}
 
+average_temps <- max_temps %>%
+  group_by (year) %>%
+  summarize (across (jan:dec, mean, na.rm = TRUE))
+
+print (average_temps)
+
+
+
 ```
 
 
@@ -203,6 +253,15 @@ Create three new data frames by slicing the data by state.
 No need to print any output here.
 
 ```{r}
+
+colorado_temp <- max_temps %>%
+  filter (state == "CO")
+
+ohio_temp <- max_temps %>%
+  filter (state == "OH")
+
+virginia_temp <- max_temps %>%
+  filter (state == "VA")
 
 ```
 
@@ -225,6 +284,22 @@ Note: This code should still run successfully even if the numbers were to change
 
 ```{r}
 
+colorado_median <- colorado_temp %>%
+  group_by (year) %>%
+  summarize (median_temp = median(jan:dec, na.rm = TRUE))
+
+
+max_year <- colorado_median %>%
+  filter(median_temp == max(median_temp)) %>%
+  pull(year)
+
+min_year <- colorado_median %>%
+  filter(median_temp == min(median_temp)) %>%
+  pull(year)
+
+print (paste("The maximum median annual temperature of", max(colorado_median$median_temp), "occurred in", max_year, "and the minimum median annual temperature of", min(colorado_median$median_temp), "occurred in", min_year,"."))
+
+
 ```
 
 
@@ -237,6 +312,17 @@ Example: The number 312 would return 6 (3 + 1 + 2)
 Run your function with 935068.
 
 ```{r}
+digits_sum <- function (n) {
+  if (n < 10) {
+    return (n)
+  } else {
+    return ((n %% 10) + digits_sum (n %/% 10))
+  }
+}
+
+example <- digits_sum (935068)
+print (example)
+
 
 ```
 
